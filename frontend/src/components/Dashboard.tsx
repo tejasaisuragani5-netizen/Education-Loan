@@ -9,7 +9,6 @@ export default function Dashboard() {
   const [requests, setRequests] = useState<DocumentRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [backendHealth, setBackendHealth] = useState<string>("checking");
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     loadData();
@@ -17,7 +16,6 @@ export default function Dashboard() {
 
   async function loadData() {
     setLoading(true);
-    setError(null);
     try {
       const [healthRes, studList, reqList] = await Promise.allSettled([
         api.checkHealth(),
@@ -25,20 +23,13 @@ export default function Dashboard() {
         api.getDocumentRequests(),
       ]);
 
-      if (healthRes.status === "fulfilled") {
-        setBackendHealth("connected");
-      } else {
-        setBackendHealth("degraded");
-      }
+      if (healthRes.status === "fulfilled") setBackendHealth("connected");
+      else setBackendHealth("degraded");
 
-      if (studList.status === "fulfilled") {
-        setStudents(studList.value);
-      }
-      if (reqList.status === "fulfilled") {
-        setRequests(reqList.value);
-      }
-    } catch (err: any) {
-      setError(err.message || "Failed to load dashboard data");
+      if (studList.status === "fulfilled") setStudents(studList.value);
+      if (reqList.status === "fulfilled") setRequests(reqList.value);
+    } catch {
+      // offline fallback
     } finally {
       setLoading(false);
     }
@@ -46,10 +37,9 @@ export default function Dashboard() {
 
   const activeStudent = students.find((s) => s.student_id === "261FA04001") || students[0];
   const pendingRequests = requests.filter((r) => r.status === "Pending").length;
-  const approvedRequests = requests.filter((r) => r.status === "Approved" || r.status === "Issued").length;
 
   return (
-    <div style={{ maxWidth: 1200, margin: "0 auto", padding: "24px 16px" }}>
+    <div style={{ maxWidth: 1240, margin: "0 auto", padding: "28px 20px" }}>
       {/* Header Banner */}
       <div
         style={{
@@ -74,32 +64,31 @@ export default function Dashboard() {
                   boxShadow: backendHealth === "connected" ? "0 0 10px #10b981" : "none",
                 }}
               />
-              <span style={{ fontSize: 13, textTransform: "uppercase", letterSpacing: 1.2, fontWeight: 600, color: "#93c5fd" }}>
-                Institutional Loan Verification System · Agent 43
+              <span style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 1.2, fontWeight: 700, color: "#93c5fd" }}>
+                VFSTR Institutional Multi-Role Infrastructure · Agent 43
               </span>
             </div>
-            <h1 style={{ fontSize: "2rem", fontWeight: 800, margin: "4px 0 12px 0", letterSpacing: "-0.02em" }}>
-              VFSTR Education Loan Orchestration
+            <h1 style={{ fontSize: "2rem", fontWeight: 800, margin: "4px 0 10px 0", letterSpacing: "-0.02em" }}>
+              Institutional Education Loan System
             </h1>
-            <p style={{ margin: 0, color: "#cbd5e1", fontSize: 15, maxWidth: 640, lineHeight: 1.5 }}>
-              Connecting Students, Institutional Accounts, Registrar Cell, and Nationalized Banks via AI-Powered Cross-Document Identity Verification.
+            <p style={{ margin: 0, color: "#cbd5e1", fontSize: 14.5, maxWidth: 680, lineHeight: 1.5 }}>
+              Dedicated role-segregated workflows for Borrowers (Students), Financial Authorities (Accounts / Registrar), and Lending Institutions (Bank Branch Officers).
             </p>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 10, alignItems: "flex-end" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "flex-end" }}>
             <span
               style={{
                 background: "rgba(255, 255, 255, 0.12)",
-                backdropFilter: "blur(8px)",
-                padding: "8px 14px",
+                padding: "6px 14px",
                 borderRadius: 9999,
-                fontSize: 13,
+                fontSize: 12,
                 fontWeight: 600,
                 color: "#e2e8f0",
-                border: "1px solid rgba(255, 255, 255, 0.18)",
+                border: "1px solid rgba(255, 255, 255, 0.2)",
               }}
             >
-              🏛️ Vignan Deemed to be University
+              🏛️ Deemed to be University
             </span>
             <button
               onClick={loadData}
@@ -108,13 +97,13 @@ export default function Dashboard() {
                 color: "white",
                 border: "none",
                 borderRadius: 8,
-                padding: "8px 16px",
-                fontSize: 13,
+                padding: "7px 14px",
+                fontSize: 12,
                 fontWeight: 600,
                 cursor: "pointer",
               }}
             >
-              🔄 Refresh Status
+              🔄 Refresh Ledger
             </button>
           </div>
         </div>
@@ -125,248 +114,227 @@ export default function Dashboard() {
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-          gap: 18,
+          gap: 16,
           marginBottom: 32,
         }}
       >
-        <div style={{ background: "white", borderRadius: 12, padding: 22, border: "1px solid #e2e8f0", boxShadow: "0 2px 6px rgba(0,0,0,0.04)" }}>
-          <div style={{ fontSize: 13, color: "#64748b", fontWeight: 600, textTransform: "uppercase" }}>Registered Borrower</div>
-          <div style={{ fontSize: 26, fontWeight: 800, color: "#0f172a", marginTop: 8 }}>
+        <div style={{ background: "white", borderRadius: 12, padding: 20, border: "1px solid #e2e8f0" }}>
+          <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700, textTransform: "uppercase" }}>Registered Borrower</div>
+          <div style={{ fontSize: 24, fontWeight: 800, color: "#0f172a", marginTop: 6 }}>
             {activeStudent ? activeStudent.name : "Tejasai"}
           </div>
-          <div style={{ fontSize: 13, color: "#2563eb", marginTop: 4, fontWeight: 600 }}>
-            Reg No: {activeStudent ? activeStudent.student_id : "261FA04001"}
+          <div style={{ fontSize: 12, color: "#2563eb", marginTop: 2, fontWeight: 700 }}>
+            {activeStudent ? activeStudent.student_id : "261FA04001"} · B.Tech CSE
           </div>
         </div>
 
-        <div style={{ background: "white", borderRadius: 12, padding: 22, border: "1px solid #e2e8f0", boxShadow: "0 2px 6px rgba(0,0,0,0.04)" }}>
-          <div style={{ fontSize: 13, color: "#64748b", fontWeight: 600, textTransform: "uppercase" }}>Sanctioned Loan</div>
-          <div style={{ fontSize: 26, fontWeight: 800, color: "#059669", marginTop: 8 }}>
+        <div style={{ background: "white", borderRadius: 12, padding: 20, border: "1px solid #e2e8f0" }}>
+          <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700, textTransform: "uppercase" }}>Sanctioned Education Loan</div>
+          <div style={{ fontSize: 24, fontWeight: 800, color: "#059669", marginTop: 6 }}>
             ₹{activeStudent ? activeStudent.sanctioned_amount?.toLocaleString("en-IN") : "20,00,000"}
           </div>
-          <div style={{ fontSize: 13, color: "#64748b", marginTop: 4 }}>
+          <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>
             Bank: {activeStudent?.loan_bank || "State Bank of India"}
           </div>
         </div>
 
-        <div style={{ background: "white", borderRadius: 12, padding: 22, border: "1px solid #e2e8f0", boxShadow: "0 2px 6px rgba(0,0,0,0.04)" }}>
-          <div style={{ fontSize: 13, color: "#64748b", fontWeight: 600, textTransform: "uppercase" }}>Pending Certificates</div>
-          <div style={{ fontSize: 26, fontWeight: 800, color: pendingRequests > 0 ? "#d97706" : "#059669", marginTop: 8 }}>
-            {pendingRequests}
+        <div style={{ background: "white", borderRadius: 12, padding: 20, border: "1px solid #e2e8f0" }}>
+          <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700, textTransform: "uppercase" }}>Certificate Queue</div>
+          <div style={{ fontSize: 24, fontWeight: 800, color: pendingRequests > 0 ? "#d97706" : "#059669", marginTop: 6 }}>
+            {pendingRequests} Pending
           </div>
-          <div style={{ fontSize: 13, color: "#64748b", marginTop: 4 }}>
-            SLA: Fast-tracked (&lt; 24 hrs)
+          <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>
+            Fast-track SLA: &lt; 24h issuance
           </div>
         </div>
 
-        <div style={{ background: "white", borderRadius: 12, padding: 22, border: "1px solid #e2e8f0", boxShadow: "0 2px 6px rgba(0,0,0,0.04)" }}>
-          <div style={{ fontSize: 13, color: "#64748b", fontWeight: 600, textTransform: "uppercase" }}>Hold Immunity</div>
-          <div style={{ fontSize: 26, fontWeight: 800, color: "#0284c7", marginTop: 8 }}>
-            ACTIVE 🛡️
+        <div style={{ background: "white", borderRadius: 12, padding: 20, border: "1px solid #e2e8f0" }}>
+          <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700, textTransform: "uppercase" }}>Hold Immunity Shield</div>
+          <div style={{ fontSize: 24, fontWeight: 800, color: "#0284c7", marginTop: 6 }}>
+            PROTECTED 🛡️
           </div>
-          <div style={{ fontSize: 13, color: "#64748b", marginTop: 4 }}>
-            Exam & Hall Ticket Shielded
+          <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>
+            Exam & Registration Holds Bypassed
           </div>
         </div>
       </div>
 
-      {/* Role Portal Quick Links */}
-      <h2 style={{ fontSize: "1.25rem", fontWeight: 700, color: "#1e293b", marginBottom: 16 }}>
-        Institutional Portals & Services
-      </h2>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-          gap: 20,
-          marginBottom: 36,
-        }}
-      >
-        <Link
-          href="/student"
+      {/* THREE SEPARATE ROLES HIERARCHY */}
+      <div style={{ marginBottom: 36 }}>
+        <div style={{ marginBottom: 16 }}>
+          <h2 style={{ fontSize: 20, fontWeight: 800, color: "#0f172a", margin: "0 0 4px 0" }}>
+            Institutional Role-Based Portals
+          </h2>
+          <p style={{ margin: 0, fontSize: 14, color: "#64748b" }}>
+            Select an operational role to access dedicated permissions, workflows, and tools.
+          </p>
+        </div>
+
+        <div
           style={{
-            textDecoration: "none",
-            background: "white",
-            borderRadius: 14,
-            padding: 24,
-            border: "1px solid #e2e8f0",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            transition: "transform 0.15s ease, box-shadow 0.15s ease",
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))",
+            gap: 20,
           }}
         >
-          <div>
-            <div style={{ fontSize: 32, marginBottom: 12 }}>🎓</div>
-            <h3 style={{ fontSize: 18, fontWeight: 700, color: "#1e293b", margin: "0 0 8px 0" }}>
-              Student Loan Desk
-            </h3>
-            <p style={{ fontSize: 14, color: "#64748b", margin: 0, lineHeight: 1.5 }}>
-              Submit Bonafide and Fee Structure certificate requests, monitor hold immunity protection, and simulate repayment moratoriums.
-            </p>
-          </div>
-          <div style={{ marginTop: 20, fontSize: 14, fontWeight: 600, color: "#2563eb", display: "flex", alignItems: "center", gap: 6 }}>
-            Launch Student Portal →
-          </div>
-        </Link>
-
-        <Link
-          href="/admin"
-          style={{
-            textDecoration: "none",
-            background: "white",
-            borderRadius: 14,
-            padding: 24,
-            border: "1px solid #e2e8f0",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            transition: "transform 0.15s ease, box-shadow 0.15s ease",
-          }}
-        >
-          <div>
-            <div style={{ fontSize: 32, marginBottom: 12 }}>🏛️</div>
-            <h3 style={{ fontSize: 18, fontWeight: 700, color: "#1e293b", margin: "0 0 8px 0" }}>
-              Registrar & Accounts Admin
-            </h3>
-            <p style={{ fontSize: 14, color: "#64748b", margin: 0, lineHeight: 1.5 }}>
-              Approve student requests, generate cryptographically sealed certificates with Code-128 & QR barcodes, and reconcile bank disbursements.
-            </p>
-          </div>
-          <div style={{ marginTop: 20, fontSize: 14, fontWeight: 600, color: "#2563eb", display: "flex", alignItems: "center", gap: 6 }}>
-            Launch Admin Portal →
-          </div>
-        </Link>
-
-        <Link
-          href="/verification"
-          style={{
-            textDecoration: "none",
-            background: "white",
-            borderRadius: 14,
-            padding: 24,
-            border: "1px solid #e2e8f0",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            transition: "transform 0.15s ease, box-shadow 0.15s ease",
-          }}
-        >
-          <div>
-            <div style={{ fontSize: 32, marginBottom: 12 }}>🏦</div>
-            <h3 style={{ fontSize: 18, fontWeight: 700, color: "#1e293b", margin: "0 0 8px 0" }}>
-              Bank Direct Verification
-            </h3>
-            <p style={{ fontSize: 14, color: "#64748b", margin: 0, lineHeight: 1.5 }}>
-              Verify student documents instantly via 12-character alphanumeric code, camera barcode scan, or upload complete 6-certificate bundles.
-            </p>
-          </div>
-          <div style={{ marginTop: 20, fontSize: 14, fontWeight: 600, color: "#2563eb", display: "flex", alignItems: "center", gap: 6 }}>
-            Launch Verification Portal →
-          </div>
-        </Link>
-      </div>
-
-      {/* Active Student Spotlight & Recent Activity */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))", gap: 24 }}>
-        {/* Student Profile Card */}
-        <div style={{ background: "white", borderRadius: 14, padding: 24, border: "1px solid #e2e8f0" }}>
-          <h3 style={{ fontSize: 17, fontWeight: 700, color: "#0f172a", marginBottom: 16 }}>
-            👤 Active Institutional Student Record
-          </h3>
-          {activeStudent ? (
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #f1f5f9", paddingBottom: 8 }}>
-                <span style={{ color: "#64748b", fontSize: 14 }}>Full Name:</span>
-                <span style={{ fontWeight: 600, color: "#0f172a", fontSize: 14 }}>{activeStudent.name}</span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #f1f5f9", paddingBottom: 8 }}>
-                <span style={{ color: "#64748b", fontSize: 14 }}>Registration Number:</span>
-                <span style={{ fontWeight: 600, color: "#2563eb", fontSize: 14 }}>{activeStudent.student_id}</span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #f1f5f9", paddingBottom: 8 }}>
-                <span style={{ color: "#64748b", fontSize: 14 }}>Program & Year:</span>
-                <span style={{ fontWeight: 600, color: "#0f172a", fontSize: 14 }}>
-                  {activeStudent.course} ({activeStudent.year})
+          {/* Role 1: Student */}
+          <div
+            style={{
+              background: "white",
+              borderRadius: 14,
+              border: "1.5px solid #bfdbfe",
+              padding: 24,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              boxShadow: "0 4px 12px rgba(37,99,235,0.06)",
+            }}
+          >
+            <div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                <span style={{ fontSize: 28 }}>🎓</span>
+                <span style={{ background: "#dbeafe", color: "#1e40af", fontSize: 11, fontWeight: 800, padding: "3px 10px", borderRadius: 9999 }}>
+                  ROLE 1: STUDENT
                 </span>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #f1f5f9", paddingBottom: 8 }}>
-                <span style={{ color: "#64748b", fontSize: 14 }}>Total 4-Year Academic Fee:</span>
-                <span style={{ fontWeight: 600, color: "#0f172a", fontSize: 14 }}>
-                  ₹{activeStudent.total_fee?.toLocaleString("en-IN")}
-                </span>
+              <h3 style={{ fontSize: 19, fontWeight: 800, color: "#0f172a", margin: "0 0 6px 0" }}>
+                Student Loan Portal
+              </h3>
+              <div style={{ fontSize: 13, color: "#2563eb", fontWeight: 700, marginBottom: 14 }}>
+                Upload / Request / Track
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #f1f5f9", paddingBottom: 8 }}>
-                <span style={{ color: "#64748b", fontSize: 14 }}>Education Loan Status:</span>
-                <span style={{ fontWeight: 600, color: "#059669", fontSize: 14 }}>
-                  {activeStudent.loan_status} ({activeStudent.loan_bank})
-                </span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ color: "#64748b", fontSize: 14 }}>Immunity Flag:</span>
-                <span style={{ fontWeight: 600, color: "#0284c7", fontSize: 14 }}>Loan-Dependent Shield Active</span>
-              </div>
+
+              <ul style={{ margin: "0 0 20px 0", paddingLeft: 20, fontSize: 13, color: "#475569", lineHeight: 1.8 }}>
+                <li><strong>My Profile:</strong> Real-time academic & fee ledger</li>
+                <li><strong>Request Documents:</strong> Bonafide & Fee Breakdown</li>
+                <li><strong>Upload Documents:</strong> 6-cert bundle pre-evaluation</li>
+                <li><strong>Track Application:</strong> Hold immunity & SLA monitor</li>
+              </ul>
             </div>
-          ) : (
-            <p style={{ color: "#64748b" }}>Loading student records...</p>
-          )}
-        </div>
 
-        {/* Recent Requests Table */}
-        <div style={{ background: "white", borderRadius: 14, padding: 24, border: "1px solid #e2e8f0" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-            <h3 style={{ fontSize: 17, fontWeight: 700, color: "#0f172a", margin: 0 }}>
-              📋 Document Request Stream
-            </h3>
-            <Link href="/admin" style={{ fontSize: 13, color: "#2563eb", textDecoration: "none", fontWeight: 600 }}>
-              Manage All →
+            <Link
+              href="/student"
+              style={{
+                display: "block",
+                textAlign: "center",
+                background: "#2563eb",
+                color: "white",
+                padding: "11px 16px",
+                borderRadius: 8,
+                fontWeight: 700,
+                fontSize: 13,
+                textDecoration: "none",
+              }}
+            >
+              Enter as Student →
             </Link>
           </div>
 
-          {requests.length === 0 ? (
-            <p style={{ color: "#64748b", fontSize: 14 }}>No document requests logged.</p>
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {requests.slice(0, 4).map((req) => (
-                <div
-                  key={req.id}
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    padding: "10px 14px",
-                    background: "#f8fafc",
-                    borderRadius: 8,
-                    border: "1px solid #f1f5f9",
-                  }}
-                >
-                  <div>
-                    <div style={{ fontWeight: 600, fontSize: 14, color: "#1e293b" }}>
-                      #{req.id} - {req.document_type}
-                    </div>
-                    <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>
-                      {req.student_id} · {req.description || "Bank requirement"} · {req.request_date}
-                    </div>
-                  </div>
-                  <span
-                    style={{
-                      padding: "4px 10px",
-                      borderRadius: 9999,
-                      fontSize: 12,
-                      fontWeight: 700,
-                      background: req.status === "Approved" || req.status === "Issued" ? "#dcfce7" : "#fef3c7",
-                      color: req.status === "Approved" || req.status === "Issued" ? "#166534" : "#92400e",
-                    }}
-                  >
-                    {req.status}
-                  </span>
-                </div>
-              ))}
+          {/* Role 2: Accounts / Admin */}
+          <div
+            style={{
+              background: "white",
+              borderRadius: 14,
+              border: "1.5px solid #cbd5e1",
+              padding: 24,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              boxShadow: "0 4px 12px rgba(15,23,42,0.06)",
+            }}
+          >
+            <div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                <span style={{ fontSize: 28 }}>🛡️</span>
+                <span style={{ background: "#f1f5f9", color: "#334155", fontSize: 11, fontWeight: 800, padding: "3px 10px", borderRadius: 9999 }}>
+                  ROLE 2: ACCOUNTS / ADMIN
+                </span>
+              </div>
+              <h3 style={{ fontSize: 19, fontWeight: 800, color: "#0f172a", margin: "0 0 6px 0" }}>
+                Registrar & Accounts Admin
+              </h3>
+              <div style={{ fontSize: 13, color: "#0f172a", fontWeight: 700, marginBottom: 14 }}>
+                Verify / Approve / Generate
+              </div>
+
+              <ul style={{ margin: "0 0 20px 0", paddingLeft: 20, fontSize: 13, color: "#475569", lineHeight: 1.8 }}>
+                <li><strong>Student Registry:</strong> Loan borrower rosters</li>
+                <li><strong>Verification Queue:</strong> AI authenticity verification</li>
+                <li><strong>Document Requests:</strong> 1-click cryptosealed issuance</li>
+                <li><strong>Audit Logs:</strong> Fee reconciliation & UTR tracking</li>
+              </ul>
             </div>
-          )}
+
+            <Link
+              href="/admin"
+              style={{
+                display: "block",
+                textAlign: "center",
+                background: "#0f172a",
+                color: "white",
+                padding: "11px 16px",
+                borderRadius: 8,
+                fontWeight: 700,
+                fontSize: 13,
+                textDecoration: "none",
+              }}
+            >
+              Enter as Accounts Admin →
+            </Link>
+          </div>
+
+          {/* Role 3: Bank Officer */}
+          <div
+            style={{
+              background: "white",
+              borderRadius: 14,
+              border: "1.5px solid #86efac",
+              padding: 24,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              boxShadow: "0 4px 12px rgba(5,150,105,0.06)",
+            }}
+          >
+            <div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                <span style={{ fontSize: 28 }}>🏦</span>
+                <span style={{ background: "#dcfce7", color: "#166534", fontSize: 11, fontWeight: 800, padding: "3px 10px", borderRadius: 9999 }}>
+                  ROLE 3: BANK OFFICER
+                </span>
+              </div>
+              <h3 style={{ fontSize: 19, fontWeight: 800, color: "#0f172a", margin: "0 0 6px 0" }}>
+                Bank Officer Direct Verify
+              </h3>
+              <div style={{ fontSize: 13, color: "#059669", fontWeight: 700, marginBottom: 14 }}>
+                Verify Institutional Document
+              </div>
+
+              <ul style={{ margin: "0 0 20px 0", paddingLeft: 20, fontSize: 13, color: "#475569", lineHeight: 1.8 }}>
+                <li><strong>Verification Code:</strong> Instant 12-character lookup</li>
+                <li><strong>Authenticity Report:</strong> 8-point checklist & evidence</li>
+                <li><strong>Document Consistency:</strong> Multi-cert field matrix</li>
+                <li><strong>Adversarial Test:</strong> Fraud & ID mismatch detection</li>
+              </ul>
+            </div>
+
+            <Link
+              href="/verification"
+              style={{
+                display: "block",
+                textAlign: "center",
+                background: "#047857",
+                color: "white",
+                padding: "11px 16px",
+                borderRadius: 8,
+                fontWeight: 700,
+                fontSize: 13,
+                textDecoration: "none",
+              }}
+            >
+              Enter as Bank Officer →
+            </Link>
+          </div>
         </div>
       </div>
     </div>
