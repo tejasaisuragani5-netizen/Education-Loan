@@ -193,7 +193,7 @@ graph LR
 - **Database**: SQLite with strict foreign constraints, system metadata flags, and cascading delete triggers.
 - **Deployment Infrastructure**:
   - Frontend: Vercel Global Edge Network (`https://education-loan-assist.vercel.app`)
-  - Backend: Uvicorn ASGI Server on port 8080 with Cloudflare Tunnel (`https://suite-trackback-again-favor.trycloudflare.com`)
+  - Backend: Uvicorn ASGI Server on port 8080 with Cloudflare Tunnel (`https://attach-last-watson-mortgage.trycloudflare.com`)
   - Continuous Delivery: Automated GitHub Actions sync across 3 remotes (`origin`, `r_assist`, `target_system`).
 
 ---

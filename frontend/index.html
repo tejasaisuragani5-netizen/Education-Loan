@@ -1218,7 +1218,7 @@
   </div>
 
   <script>
-    const CLOUDFLARE_BACKEND_URL = "https://suite-trackback-again-favor.trycloudflare.com";
+    const CLOUDFLARE_BACKEND_URL = "https://attach-last-watson-mortgage.trycloudflare.com";
 
     var API_URL = (function() {
       if (window.location.origin && window.location.origin.includes(':8080')) {
@@ -1226,7 +1226,8 @@
       }
       let saved = localStorage.getItem('API_URL');
       if (window.location.protocol === 'https:') {
-        if (!saved || saved.startsWith('http://localhost') || saved.startsWith('http://127.0.0.1')) {
+        // Auto-upgrade if saved is empty, localhost, or an expired trycloudflare tunnel
+        if (!saved || saved.startsWith('http://localhost') || saved.startsWith('http://127.0.0.1') || (saved.includes('trycloudflare.com') && saved !== CLOUDFLARE_BACKEND_URL)) {
           localStorage.setItem('API_URL', CLOUDFLARE_BACKEND_URL);
           return CLOUDFLARE_BACKEND_URL;
         }
@@ -1258,6 +1259,22 @@
           return true;
         }
       } catch (err) {
+        // Self-healing: If current API_URL failed, auto-fallback to CLOUDFLARE_BACKEND_URL!
+        if (API_URL !== CLOUDFLARE_BACKEND_URL) {
+          try {
+            const fallbackRes = await fetch(CLOUDFLARE_BACKEND_URL + '/health', { cache: 'no-store' });
+            if (fallbackRes.ok) {
+              API_URL = CLOUDFLARE_BACKEND_URL;
+              localStorage.setItem('API_URL', API_URL);
+              const inp = document.getElementById('apiBaseUrlInput');
+              if (inp) inp.value = API_URL;
+              if (dot) dot.style.background = '#16a34a';
+              if (text) text.innerText = 'Connected: Cloudflare';
+              refreshAll();
+              return true;
+            }
+          } catch (e2) {}
+        }
         if (dot) dot.style.background = '#dc2626';
         if (text) text.innerText = 'Backend Offline';
         if (showToast) showNotice('Could not connect to backend at ' + API_URL, true);
