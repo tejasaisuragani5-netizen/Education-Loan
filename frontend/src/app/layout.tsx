@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
+import SecurityAuthBar from "../components/SecurityAuthBar";
 import "../styles/globals.css";
 
 export const metadata: Metadata = {
@@ -33,6 +34,9 @@ export default function RootLayout({
           fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
         }}
       >
+        {/* Security & Role Authentication Telemetry Strip */}
+        <SecurityAuthBar />
+
         {/* Global Institutional Navigation */}
         <header
           style={{

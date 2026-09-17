@@ -186,11 +186,18 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const baseUrl = getApiBaseUrl();
   const url = `${baseUrl}${path}`;
   
+  const token = typeof window !== "undefined" ? localStorage.getItem("AUTH_TOKEN") : null;
+  const authHeaders: Record<string, string> = {};
+  if (token) {
+    authHeaders["Authorization"] = `Bearer ${token}`;
+  }
+
   try {
     const res = await fetch(url, {
       ...options,
       headers: {
         Accept: "application/json",
+        ...authHeaders,
         ...(options?.headers || {}),
       },
     });
@@ -213,6 +220,30 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  async login(role: string = "STUDENT", password?: string): Promise<any> {
+    const res = await request<any>("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ role, password: password || `${role.toLowerCase()}123` }),
+    });
+    if (res && res.access_token && typeof window !== "undefined") {
+      localStorage.setItem("AUTH_TOKEN", res.access_token);
+      localStorage.setItem("USER_ROLE", res.role);
+    }
+    return res;
+  },
+
+  async getMe(): Promise<any> {
+    return request("/api/auth/me");
+  },
+
+  logout() {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("AUTH_TOKEN");
+      localStorage.removeItem("USER_ROLE");
+    }
+  },
+
   async checkHealth(): Promise<{ status: string; app?: string; timestamp?: string }> {
     return request("/health");
   },

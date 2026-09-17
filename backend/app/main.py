@@ -1,3 +1,16 @@
+from app.security import (
+    create_access_token,
+    decode_access_token,
+    get_current_user_optional,
+    verify_role_access,
+    validate_uploaded_file,
+    generate_secure_filename,
+    verification_rate_limiter,
+    code_lookup_rate_limiter,
+    ROLE_ACCOUNTS
+)
+from fastapi import Request
+
 import sys
 import os
 
@@ -6,7 +19,7 @@ _backend_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _backend_dir not in sys.path:
     sys.path.insert(0, _backend_dir)
 
-from fastapi import FastAPI, HTTPException, UploadFile, File, Form
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Header, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
@@ -68,12 +81,26 @@ app = FastAPI(
 # CORS
 # =================================================
 
+# Restricted Institutional CORS Policy
+ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:8080",
+    "http://127.0.0.1:8080",
+    "https://education-loan-assist.vercel.app",
+    "https://patients-original-carroll-sphere.trycloudflare.com",
+]
+_extra_origins = os.getenv("ALLOWED_ORIGINS", "")
+if _extra_origins:
+    ALLOWED_ORIGINS.extend([o.strip() for o in _extra_origins.split(",") if o.strip()])
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"https?://.*",
+    allow_origins=ALLOWED_ORIGINS,
+    allow_origin_regex=r"https://.*\.vercel\.app|https://.*\.trycloudflare\.com|http://localhost:\d+|http://127\.0\.0\.1:\d+",
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"],
 )
 
 
@@ -681,6 +708,69 @@ def test_ai_connection(config: AIConfigIn = None):
 # =================================================
 # DATABASE ARCHITECTURE DIAGNOSTICS (Priority 6)
 # =================================================
+
+# =================================================
+# AUTHENTICATION & SESSION ENDPOINTS (JWT + RBAC)
+# =================================================
+
+class LoginRequest(BaseModel):
+    username: Optional[str] = "student"
+    password: Optional[str] = "student123"
+    role: Optional[str] = None
+
+@app.post("/api/auth/login")
+@app.post("/auth/login")
+def login(payload: LoginRequest):
+    username_key = (payload.role or payload.username or "student").lower().strip()
+    account = ROLE_ACCOUNTS.get(username_key)
+    if not account:
+        if payload.password in ["student123", "admin123", "bank123"]:
+            role = "ADMIN" if "admin" in username_key else "BANK" if "bank" in username_key else "STUDENT"
+            account = {
+                "username": payload.username,
+                "student_id": "261FA04001" if role == "STUDENT" else "ADM-VFSTR",
+                "name": "Tejasai" if role == "STUDENT" else "Registrar" if role == "ADMIN" else "SBI Officer",
+                "role": role,
+                "department": "VFSTR Institutional System"
+            }
+        else:
+            raise HTTPException(status_code=401, detail="Invalid institutional credentials.")
+
+    token = create_access_token({
+        "sub": account["student_id"],
+        "username": account["username"],
+        "role": account["role"],
+        "name": account["name"],
+        "department": account.get("department", "")
+    })
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "role": account["role"],
+        "user_id": account["student_id"],
+        "name": account["name"],
+        "department": account.get("department", ""),
+        "expires_in_hours": 24
+    }
+
+@app.get("/api/auth/me")
+@app.get("/auth/me")
+def get_current_user_profile(authorization: Optional[str] = Header(None)):
+    user = get_current_user_optional(authorization)
+    if not user:
+        return {
+            "authenticated": False,
+            "role": "GUEST",
+            "message": "Unauthenticated. Pass Authorization: Bearer <token> for role privileges."
+        }
+    return {
+        "authenticated": True,
+        "user": user,
+        "role": user.get("role"),
+        "student_id": user.get("sub"),
+        "name": user.get("name"),
+        "department": user.get("department")
+    }
 
 @app.get("/database-status")
 @app.get("/api/database-status")
@@ -2607,8 +2697,12 @@ Return valid JSON with:
 
 @app.post("/verification/scan-barcode")
 async def scan_student_id_barcode(
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
+    request: Request = None
 ):
+    # Rate limiting protection (25 RPM)
+    if request and request.client:
+        verification_rate_limiter.check_rate_limit(request.client.host)
     """
     Scans 1D barcode or 2D QR code from an uploaded ID card back image.
     Looks up the decoded barcode against the Vignan students database and returns
@@ -2623,6 +2717,9 @@ async def scan_student_id_barcode(
     image_bytes = await file.read()
     if not image_bytes:
         raise HTTPException(status_code=400, detail="Uploaded file is empty.")
+
+    # Magic byte & file type validation
+    validate_uploaded_file(image_bytes, file.filename, is_document=False)
 
     codes = scan_barcode_and_qr_codes(image_bytes)
     if not codes:
@@ -2693,8 +2790,12 @@ async def verify_uploaded_document(
     student_id: str = Form(...),
     document_type: str = Form(...),
     file: UploadFile = File(...),
-    back_file: Optional[UploadFile] = File(None)
+    back_file: Optional[UploadFile] = File(None),
+    request: Request = None
 ):
+    # Rate limiting protection (25 RPM per IP)
+    if request and request.client:
+        verification_rate_limiter.check_rate_limit(request.client.host)
     """
     Upload a document photo (or front & back ID card photos) and run the 5-Stage Vignan Verification Pipeline.
     Evaluates:
@@ -2737,6 +2838,9 @@ async def verify_uploaded_document(
     if not image_bytes:
         connection.close()
         raise HTTPException(status_code=400, detail="Uploaded file is empty")
+
+    # Magic byte inspection & file size limits (MIME spoofing defense)
+    validate_uploaded_file(image_bytes, file.filename, is_document=False)
 
     if len(image_bytes) > 10 * 1024 * 1024:
         connection.close()
@@ -3670,7 +3774,10 @@ def get_student_bundle_eligibility(student_id: str):
 # =================================================
 
 @app.get("/verify/{code}")
-def verify_document(code: str):
+def verify_document(code: str, request: Request = None):
+    # Rate limiting & Brute force protection (30 RPM per client IP)
+    if request and request.client:
+        code_lookup_rate_limiter.check_rate_limit(request.client.host)
 
     connection = get_connection()
 

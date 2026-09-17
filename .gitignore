@@ -43,3 +43,13 @@ generated_documents/
 bundle_uploads/
 scratch/
 /students.db
+
+
+# Strict Secret Isolation & Security
+**/.env
+**/.env.*
+!**/.env.example
+*.pem
+*.key
+*.cert
+secrets/
