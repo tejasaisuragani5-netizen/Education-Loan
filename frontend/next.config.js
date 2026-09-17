@@ -7,14 +7,6 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  async rewrites() {
-    return [
-      {
-        source: '/',
-        destination: '/portal.html',
-      },
-    ];
-  },
 };
 
 module.exports = nextConfig;
