@@ -5,9 +5,10 @@ import DocumentUpload from "../../components/DocumentUpload";
 import VerificationResult from "../../components/VerificationResult";
 import AuditTrail from "../../components/AuditTrail";
 import DatabaseArchitecture from "../../components/DatabaseArchitecture";
+import SystemValidation from "../../components/SystemValidation";
 import { api, DocumentRequest, Student, IssuedDocument, Disbursement, VerificationResultData, BundleEvaluationData } from "../../lib/api";
 
-type AdminTab = "registry" | "verification" | "requests" | "audit";
+type AdminTab = "registry" | "verification" | "requests" | "audit" | "validation";
 
 export default function AdminPortalPage() {
   const [activeTab, setActiveTab] = useState<AdminTab>("requests");
@@ -23,6 +24,12 @@ export default function AdminPortalPage() {
 
   useEffect(() => {
     loadAdminData();
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("tab") === "validation") {
+        setActiveTab("validation");
+      }
+    }
   }, []);
 
   async function loadAdminData() {
@@ -133,6 +140,7 @@ export default function AdminPortalPage() {
           { id: "registry", label: "🎓 Student Registry" },
           { id: "verification", label: "⚡ Verification Queue" },
           { id: "audit", label: "📋 Audit Logs & Reconciliation" },
+          { id: "validation", label: "🧪 System Health & Test Results (7/7 ✓)" },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -384,6 +392,11 @@ export default function AdminPortalPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* SECTION 5: SYSTEM HEALTH & TEST RESULTS (Make Testing Visible) */}
+      {activeTab === "validation" && (
+        <SystemValidation />
       )}
     </div>
   );

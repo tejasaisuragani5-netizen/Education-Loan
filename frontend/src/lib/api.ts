@@ -139,6 +139,37 @@ export interface VerificationResultData {
   details?: any;
 }
 
+export interface SystemTestCase {
+  id: string;
+  name: string;
+  status: "PASS" | "FAIL" | string;
+  icon: string;
+  test_file: string;
+  description: string;
+  duration_ms: number;
+  adversarial_tested: boolean;
+  details?: string;
+}
+
+export interface SystemValidationData {
+  title: string;
+  status: "ALL_PASS" | "PARTIAL_FAIL" | string;
+  passed_count: number;
+  total_count: number;
+  pass_ratio: string;
+  presentation_quote: string;
+  tests: SystemTestCase[];
+  pytest_summary: {
+    total_items: number;
+    passed: number;
+    failed: number;
+    execution_time_seconds: number;
+    framework: string;
+    python_version: string;
+    last_executed?: string;
+  };
+}
+
 export interface BundleEvaluationData {
   id: number;
   student_id: string;
@@ -184,7 +215,7 @@ export function getApiBaseUrl(): string {
   if (process.env.NEXT_PUBLIC_API_BASE_URL) {
     return process.env.NEXT_PUBLIC_API_BASE_URL.replace(/\/$/, "");
   }
-  return "https://patients-original-carroll-sphere.trycloudflare.com";
+  return "https://choose-site-replies-citysearch.trycloudflare.com";
 }
 
 export function setApiBaseUrl(url: string) {
@@ -456,6 +487,16 @@ export const api = {
     });
   },
 
+  
+  async getSystemValidation(): Promise<SystemValidationData> {
+    return request<SystemValidationData>("/api/system/test-results");
+  },
+
+  async runSystemValidation(): Promise<SystemValidationData> {
+    return request<SystemValidationData>("/api/system/run-tests", {
+      method: "POST",
+    });
+  },
   async getDatabaseStatus(): Promise<any> {
     return request("/database-status");
   },
