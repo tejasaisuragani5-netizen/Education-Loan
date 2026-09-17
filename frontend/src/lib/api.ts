@@ -65,6 +65,16 @@ export interface Disbursement {
   academic_year?: string;
 }
 
+export interface AuditLogEntry {
+  id: number;
+  user_id: string;
+  action: string;
+  document_id?: string;
+  timestamp: string;
+  result?: string;
+  ip_session?: string;
+}
+
 export interface EightPointCheck {
   point: string;
   status: "MATCHED" | "DETECTED" | "NOT DETECTED" | "MISMATCH" | string;
@@ -381,6 +391,27 @@ export const api = {
 
   async getTurnaroundTime(): Promise<any> {
     return request("/reports/turnaround");
+  },
+
+  async getAuditLogs(userId?: string, limit = 100): Promise<AuditLogEntry[]> {
+    const query = new URLSearchParams();
+    if (userId) query.append("user_id", userId);
+    query.append("limit", limit.toString());
+    return request<AuditLogEntry[]>(`/audit-logs?${query.toString()}`);
+  },
+
+  async addAuditLog(entry: {
+    user_id: string;
+    action: string;
+    document_id?: string;
+    result?: string;
+    ip_session?: string;
+  }): Promise<{ status: string; message: string }> {
+    return request<{ status: string; message: string }>("/audit-logs", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(entry),
+    });
   },
 };
 

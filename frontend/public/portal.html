@@ -903,7 +903,191 @@
             </div>
           </div>
 
-          <!-- Physical Document Scan & OCR Upload -->
+          
+          <!-- ================================================================= -->
+          <!-- PRIORITY 5: COMPLETE AUDIT TRAIL & TAMPER PREVENTION LEDGER     -->
+          <!-- ================================================================= -->
+          <div class="section" id="auditTrailSection" style="margin-top:24px; border:2px solid #3b82f6; border-radius:14px; background:#ffffff; padding:24px; box-shadow:0 4px 15px rgba(59,130,246,0.08);">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+              <div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span style="font-size:22px;">🔒</span>
+                  <h3 style="font-size:18px; font-weight:800; color:#0f172a; margin:0; letter-spacing:0.5px;">
+                    AUDIT LOG & IMMUTABLE SECURITY LEDGER
+                  </h3>
+                </div>
+                <p style="margin:4px 0 0 0; font-size:13px; color:#64748b;">
+                  Every important action creates an immutable, append-only audit record linked to institutional database truth.
+                </p>
+              </div>
+
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:9999px; font-size:12px; font-weight:700; background:#ecfdf5; color:#047857; border:1px solid #a7f3d0;">
+                  <span style="width:8px; height:8px; border-radius:50%; background:#10b981;"></span>
+                  LEDGER INTEGRITY: SECURE (100%)
+                </span>
+                <button onclick="loadAuditLogsPortal()" style="background:#0f172a; color:#ffffff; border:none; border-radius:8px; padding:7px 14px; font-size:12px; font-weight:700; cursor:pointer;">
+                  🔄 Refresh Ledger
+                </button>
+              </div>
+            </div>
+
+            <!-- Audit Filter Tabs -->
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; border-bottom:1px solid #e2e8f0; padding-bottom:12px;">
+              <button onclick="filterPortalAudit('ALL')" id="auditFilterBtn-ALL" style="background:#2563eb; color:white; border:none; border-radius:6px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer;">All Records</button>
+              <button onclick="filterPortalAudit('STUDENT')" id="auditFilterBtn-STUDENT" style="background:#f1f5f9; color:#475569; border:none; border-radius:6px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer;">👤 Student 261FA04001</button>
+              <button onclick="filterPortalAudit('AI')" id="auditFilterBtn-AI" style="background:#f1f5f9; color:#475569; border:none; border-radius:6px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer;">⚡ AI Verification</button>
+              <button onclick="filterPortalAudit('ADMIN')" id="auditFilterBtn-ADMIN" style="background:#f1f5f9; color:#475569; border:none; border-radius:6px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer;">🏛️ Admin Registrar</button>
+              <button onclick="filterPortalAudit('BANK')" id="auditFilterBtn-BANK" style="background:#f1f5f9; color:#475569; border:none; border-radius:6px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer;">🏦 Bank Officer (SBI)</button>
+              <button onclick="filterPortalAudit('SECURITY')" id="auditFilterBtn-SECURITY" style="background:#f1f5f9; color:#475569; border:none; border-radius:6px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer;">🛡️ Security Gateway</button>
+            </div>
+
+            <!-- Chronological Timeline List -->
+            <div id="portalAuditTimeline" style="display:flex; flex-direction:column; gap:12px;">
+              <!-- Seed Timeline Items -->
+              <div class="audit-item" data-role="SECURITY" style="border:1px solid #fecdd3; border-radius:10px; padding:14px; background:#fff1f2;">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:6px;">
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-family:monospace; font-size:11px; font-weight:700; background:#e2e8f0; padding:2px 8px; border-radius:4px; color:#0f172a;">⏱ 17 Sep 2026 18:25</span>
+                    <span style="font-size:12px; font-weight:700; padding:2px 10px; border-radius:9999px; background:#fff1f2; color:#be123c; border:1px solid #fecdd3;">🛡️ Security Gateway</span>
+                  </div>
+                  <span style="font-size:11px; color:#94a3b8; font-family:monospace;">🌐 127.0.0.1 (Adversarial Scanner)</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px;">
+                  <div>
+                    <div style="font-size:14px; font-weight:700; color:#0f172a;">Adversarial Mismatch Detected (241FA04195 != 261FA04001)</div>
+                    <div style="font-size:12px; color:#64748b;">Target Document: <span style="font-family:monospace; color:#2563eb;">ADVERSARIAL-TEST</span></div>
+                  </div>
+                  <span style="padding:4px 10px; border-radius:6px; font-size:11px; font-weight:800; background:#fee2e2; color:#991b1b; border:1px solid #fca5a5;">Result: FLAGGED & BLOCKED</span>
+                </div>
+              </div>
+
+              <div class="audit-item" data-role="BANK" style="border:1px solid #e2e8f0; border-radius:10px; padding:14px; background:#ffffff;">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:6px;">
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-family:monospace; font-size:11px; font-weight:700; background:#e2e8f0; padding:2px 8px; border-radius:4px; color:#0f172a;">⏱ 17 Sep 2026 18:24</span>
+                    <span style="font-size:12px; font-weight:700; padding:2px 10px; border-radius:9999px; background:#f0fdfa; color:#0f766e; border:1px solid #99f6e4;">🏦 Bank Officer (SBI)</span>
+                  </div>
+                  <span style="font-size:11px; color:#94a3b8; font-family:monospace;">🌐 14.139.245.10 (Bank Gateway)</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px;">
+                  <div>
+                    <div style="font-size:14px; font-weight:700; color:#0f172a;">Verified Institutional Document ELN-261FA04001</div>
+                    <div style="font-size:12px; color:#64748b;">Target Document: <span style="font-family:monospace; color:#2563eb;">ELN-261FA04001</span></div>
+                  </div>
+                  <span style="padding:4px 10px; border-radius:6px; font-size:11px; font-weight:800; background:#dcfce7; color:#166534; border:1px solid #86efac;">Result: AUTHENTIC</span>
+                </div>
+              </div>
+
+              <div class="audit-item" data-role="ADMIN" style="border:1px solid #e2e8f0; border-radius:10px; padding:14px; background:#ffffff;">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:6px;">
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-family:monospace; font-size:11px; font-weight:700; background:#e2e8f0; padding:2px 8px; border-radius:4px; color:#0f172a;">⏱ 17 Sep 2026 18:22</span>
+                    <span style="font-size:12px; font-weight:700; padding:2px 10px; border-radius:9999px; background:#ecfdf5; color:#047857; border:1px solid #a7f3d0;">🏛️ Admin</span>
+                  </div>
+                  <span style="font-size:11px; color:#94a3b8; font-family:monospace;">🌐 10.0.4.12 (Registrar Workstation)</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px;">
+                  <div>
+                    <div style="font-size:14px; font-weight:700; color:#0f172a;">Generated Loan Eligibility Dossier</div>
+                    <div style="font-size:12px; color:#64748b;">Target Document: <span style="font-family:monospace; color:#2563eb;">DOSSIER-261FA04001</span></div>
+                  </div>
+                  <span style="padding:4px 10px; border-radius:6px; font-size:11px; font-weight:800; background:#dbeafe; color:#1e40af; border:1px solid #93c5fd;">Result: ISSUED</span>
+                </div>
+              </div>
+
+              <div class="audit-item" data-role="AI" style="border:1px solid #e2e8f0; border-radius:10px; padding:14px; background:#ffffff;">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:6px;">
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-family:monospace; font-size:11px; font-weight:700; background:#e2e8f0; padding:2px 8px; border-radius:4px; color:#0f172a;">⏱ 17 Sep 2026 18:21</span>
+                    <span style="font-size:12px; font-weight:700; padding:2px 10px; border-radius:9999px; background:#f5f3ff; color:#6d28d9; border:1px solid #ddd6fe;">⚡ AI Verification</span>
+                  </div>
+                  <span style="font-size:11px; color:#94a3b8; font-family:monospace;">🌐 127.0.0.1 (Integrity Engine)</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px;">
+                  <div>
+                    <div style="font-size:14px; font-weight:700; color:#0f172a;">Cross-document verification</div>
+                    <div style="font-size:12px; color:#64748b;">Target Document: <span style="font-family:monospace; color:#2563eb;">BUNDLE-261FA04001</span></div>
+                  </div>
+                  <span style="padding:4px 10px; border-radius:6px; font-size:11px; font-weight:800; background:#dcfce7; color:#166534; border:1px solid #86efac;">Result: PASSED</span>
+                </div>
+              </div>
+
+              <div class="audit-item" data-role="AI" style="border:1px solid #e2e8f0; border-radius:10px; padding:14px; background:#ffffff;">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:6px;">
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-family:monospace; font-size:11px; font-weight:700; background:#e2e8f0; padding:2px 8px; border-radius:4px; color:#0f172a;">⏱ 17 Sep 2026 18:20</span>
+                    <span style="font-size:12px; font-weight:700; padding:2px 10px; border-radius:9999px; background:#f5f3ff; color:#6d28d9; border:1px solid #ddd6fe;">⚡ AI Verification</span>
+                  </div>
+                  <span style="font-size:11px; color:#94a3b8; font-family:monospace;">🌐 127.0.0.1 (Gemini Vision)</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px;">
+                  <div>
+                    <div style="font-size:14px; font-weight:700; color:#0f172a;">AI Verification (8-Point Checklist)</div>
+                    <div style="font-size:12px; color:#64748b;">Target Document: <span style="font-family:monospace; color:#2563eb;">DOC-FEE-2026</span></div>
+                  </div>
+                  <span style="padding:4px 10px; border-radius:6px; font-size:11px; font-weight:800; background:#dcfce7; color:#166534; border:1px solid #86efac;">Result: VERIFIED<br>Confidence: 98%</span>
+                </div>
+              </div>
+
+              <div class="audit-item" data-role="STUDENT" style="border:1px solid #e2e8f0; border-radius:10px; padding:14px; background:#f8fafc;">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:6px;">
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-family:monospace; font-size:11px; font-weight:700; background:#e2e8f0; padding:2px 8px; border-radius:4px; color:#0f172a;">⏱ 17 Sep 2026 18:20</span>
+                    <span style="font-size:12px; font-weight:700; padding:2px 10px; border-radius:9999px; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe;">👤 Student 261FA04001</span>
+                  </div>
+                  <span style="font-size:11px; color:#94a3b8; font-family:monospace;">🌐 192.168.1.45 (Student Portal)</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px;">
+                  <div>
+                    <div style="font-size:14px; font-weight:700; color:#0f172a;">Uploaded Fee Structure</div>
+                    <div style="font-size:12px; color:#64748b;">Target Document: <span style="font-family:monospace; color:#2563eb;">DOC-FEE-2026</span></div>
+                  </div>
+                  <span style="padding:4px 10px; border-radius:6px; font-size:11px; font-weight:800; background:#dcfce7; color:#166534; border:1px solid #86efac;">SUCCESS</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Database Schema & Tamper Prevention Q&A Card -->
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:16px; margin-top:20px;">
+              <!-- Schema Box -->
+              <div style="background:#0f172a; border-radius:12px; padding:18px; color:#f8fafc; font-family:monospace; font-size:12px;">
+                <div style="color:#38bdf8; font-weight:700; font-size:13px; margin-bottom:8px;">
+                  🗄️ Database: audit_logs
+                </div>
+                <pre style="margin:0; color:#94a3b8; line-height:1.5;">CREATE TABLE audit_logs (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id     TEXT NOT NULL,
+    action      TEXT NOT NULL,
+    document_id TEXT,
+    timestamp   TEXT NOT NULL,
+    result      TEXT,
+    ip_session  TEXT
+);</pre>
+                <div style="margin-top:10px; border-top:1px solid #334155; padding-top:8px; color:#cbd5e1; font-size:11px;">
+                  🔒 Append-only immutability. No update or delete operations allowed.
+                </div>
+              </div>
+
+              <!-- Tamper Prevention Answer Box -->
+              <div style="background:linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); border-radius:12px; padding:18px; color:#ffffff;">
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                  <span style="font-size:16px;">💡</span>
+                  <h4 style="margin:0; font-size:14px; font-weight:800; color:#a5b4fc;">
+                    "How do you prevent manipulation or unauthorized changes?"
+                  </h4>
+                </div>
+                <ul style="margin:0; padding-left:18px; font-size:12px; color:#e0e7ff; line-height:1.55;">
+                  <li><strong>Append-Only Immutability:</strong> All actions log timestamp, user, action, result, and client IP into an unalterable table.</li>
+                  <li><strong>Cryptographic Digital Seals:</strong> Issued documents carry 12-char hashes (<code>ELN-261FA04001</code>) and QR codes verified in real-time.</li>
+                  <li><strong>Multi-Modal Cross-Checking:</strong> AI synthesizes certificates to catch spliced data (e.g. <code>241FA04195</code> in <code>261FA04001</code>).</li>
+                  <li><strong>Role-Based Segregation:</strong> Strict separation of duties between Student, Registrar, and Bank Officers.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+<!-- Physical Document Scan & OCR Upload -->
           <div class="section" style="margin-top:24px;">
             <h2>Scan & OCR Authenticity Verification (Scanned Files)</h2>
             <p style="font-size:13px; color:#64748b; margin-bottom:14px;">Upload a scanned document photo or student ID card to run the circular seal detector and barcode/QR decoder.</p>

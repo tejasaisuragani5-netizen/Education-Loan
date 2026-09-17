@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import StatusTracker from "../../components/StatusTracker";
 import DocumentUpload from "../../components/DocumentUpload";
 import VerificationResult from "../../components/VerificationResult";
+import AuditTrail from "../../components/AuditTrail";
 import { api, Student, RepaymentEstimate, VerificationResultData, BundleEvaluationData } from "../../lib/api";
 
 type StudentTab = "profile" | "request" | "upload" | "track";
@@ -447,6 +448,11 @@ export default function StudentPortalPage() {
                 </div>
               </div>
             )}
+          </div>
+
+          {/* Student Document Security Audit Trail */}
+          <div style={{ marginTop: 24 }}>
+            <AuditTrail initialUserId="261FA04001" showTamperExplanation={false} />
           </div>
         </div>
       )}

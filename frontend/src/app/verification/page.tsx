@@ -4,9 +4,10 @@ import React, { useState } from "react";
 import DocumentUpload from "../../components/DocumentUpload";
 import VerificationResult from "../../components/VerificationResult";
 import DocumentComparison from "../../components/DocumentComparison";
+import AuditTrail from "../../components/AuditTrail";
 import { api, VerificationResultData, BundleEvaluationData } from "../../lib/api";
 
-type BankTab = "code" | "report" | "consistency";
+type BankTab = "code" | "report" | "consistency" | "audit";
 
 export default function BankVerificationPage() {
   const [activeTab, setActiveTab] = useState<BankTab>("code");
@@ -135,6 +136,23 @@ export default function BankVerificationPage() {
         >
           📊 Document Consistency & Adversarial Test
         </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("audit")}
+          style={{
+            background: activeTab === "audit" ? "#047857" : "#f1f5f9",
+            color: activeTab === "audit" ? "white" : "#475569",
+            border: "none",
+            borderRadius: 8,
+            padding: "10px 18px",
+            fontSize: 14,
+            fontWeight: 700,
+            cursor: "pointer",
+          }}
+        >
+          🔒 Compliance & Audit Trail
+        </button>
       </div>
 
       {/* SECTION 1: VERIFICATION CODE LOOKUP */}
@@ -262,6 +280,13 @@ export default function BankVerificationPage() {
       {activeTab === "consistency" && (
         <div>
           <DocumentComparison />
+        </div>
+      )}
+
+      {/* SECTION 4: COMPLIANCE & AUDIT TRAIL */}
+      {activeTab === "audit" && (
+        <div>
+          <AuditTrail />
         </div>
       )}
     </div>
