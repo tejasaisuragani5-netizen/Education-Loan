@@ -2,8 +2,44 @@ import os
 import secrets
 import time
 from datetime import datetime, timedelta
-from typing import Optional, List, Dict
-import jwt
+try:
+    import jwt
+except ImportError:
+    import base64
+    import json
+    import hmac
+    import hashlib
+    class _FallbackJWT:
+        class ExpiredSignatureError(Exception): pass
+        class InvalidTokenError(Exception): pass
+        @staticmethod
+        def encode(payload: dict, key: str, algorithm: str = "HS256") -> str:
+            clean = {}
+            for k, v in payload.items():
+                if isinstance(v, datetime):
+                    clean[k] = int(v.timestamp())
+                else:
+                    clean[k] = v
+            header = base64.urlsafe_b64encode(json.dumps({"alg": "HS256", "typ": "JWT"}).encode()).decode().rstrip("=")
+            body = base64.urlsafe_b64encode(json.dumps(clean).encode()).decode().rstrip("=")
+            sig = base64.urlsafe_b64encode(hmac.new(key.encode(), f"{header}.{body}".encode(), hashlib.sha256).digest()).decode().rstrip("=")
+            return f"{header}.{body}.{sig}"
+        @staticmethod
+        def decode(token: str, key: str, algorithms: list = None) -> dict:
+            parts = token.split(".")
+            if len(parts) != 3:
+                raise _FallbackJWT.InvalidTokenError()
+            header, body, sig = parts
+            expected_sig = base64.urlsafe_b64encode(hmac.new(key.encode(), f"{header}.{body}".encode(), hashlib.sha256).digest()).decode().rstrip("=")
+            if not hmac.compare_digest(sig, expected_sig):
+                raise _FallbackJWT.InvalidTokenError()
+            padding = "=" * ((4 - len(body) % 4) % 4)
+            data = json.loads(base64.urlsafe_b64decode(body + padding).decode())
+            if "exp" in data and time.time() > data["exp"]:
+                raise _FallbackJWT.ExpiredSignatureError()
+            return data
+    jwt = _FallbackJWT()
+
 from fastapi import HTTPException, Header, Request, status
 
 # ==============================================================================
