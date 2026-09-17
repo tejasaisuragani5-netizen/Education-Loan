@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { VerificationResultData, BundleEvaluationData, api } from "../lib/api";
+import DocumentComparison from "./DocumentComparison";
 
 interface VerificationResultProps {
   result: VerificationResultData | BundleEvaluationData | null;
@@ -288,7 +289,10 @@ export default function VerificationResult({ result, onReset }: VerificationResu
         </div>
       </div>
 
-      {/* 5. Action Buttons */}
+      {/* 5. Document Consistency & Cross-Document Comparison Engine */}
+      <DocumentComparison />
+
+      {/* 6. Action Buttons */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
         <div style={{ display: "flex", gap: 10 }}>
           {isBundle && (result as BundleEvaluationData).id && (

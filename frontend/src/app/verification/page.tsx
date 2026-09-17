@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import DocumentUpload from "../../components/DocumentUpload";
 import VerificationResult from "../../components/VerificationResult";
+import DocumentComparison from "../../components/DocumentComparison";
 import { api, VerificationResultData, BundleEvaluationData } from "../../lib/api";
 
 export default function BankVerificationPage() {
@@ -113,11 +114,14 @@ export default function BankVerificationPage() {
       </div>
 
       {/* Verification Result Showcase */}
-      {verifResult && (
+      {verifResult ? (
         <VerificationResult
           result={verifResult}
           onReset={() => setVerifResult(null)}
         />
+      ) : (
+        /* Standalone Document Consistency Matrix with Adversarial Test */
+        <DocumentComparison />
       )}
 
       {/* AI Document & Bundle Uploader */}
