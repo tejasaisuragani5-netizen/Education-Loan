@@ -65,15 +65,27 @@ export interface Disbursement {
   academic_year?: string;
 }
 
+export interface EightPointCheck {
+  point: string;
+  status: "MATCHED" | "DETECTED" | "NOT DETECTED" | "MISMATCH" | string;
+  details?: string;
+  icon?: string;
+}
+
 export interface VerificationResultData {
-  success: boolean;
-  verified: boolean;
+  success?: boolean;
+  verified?: boolean;
+  valid?: boolean;
+  overall?: "VERIFIED" | "REVIEW" | "REJECTED" | string;
+  confidence?: number;
   doc_type?: string;
+  document_type?: string;
   student_name?: string;
   student_id?: string;
   roll_number?: string;
   course?: string;
   year?: string;
+  academic_year?: string;
   fee_total?: number;
   fee_balance?: number;
   bank_name?: string;
@@ -82,6 +94,17 @@ export interface VerificationResultData {
   security_seal_detected?: boolean;
   tamper_risk?: "LOW" | "MEDIUM" | "HIGH";
   tamper_reasons?: string[];
+  eight_point_verification?: EightPointCheck[];
+  evidence?: {
+    register_no?: string;
+    extracted_name?: string;
+    fee?: string;
+    academic_year?: string;
+    course?: string;
+    verification_code?: string;
+    authorized_signatory?: string;
+  };
+  why_this_result?: string[];
   cross_doc_synthesis?: {
     synthesis_score?: number;
     dimensions_matched?: number;
