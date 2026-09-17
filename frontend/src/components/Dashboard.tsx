@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import DatabaseArchitecture from "./DatabaseArchitecture";
 import { api, Student, DocumentRequest } from "../lib/api";
 
 export default function Dashboard() {
@@ -336,6 +337,11 @@ export default function Dashboard() {
             </Link>
           </div>
         </div>
+      </div>
+
+      {/* Database Architecture Showcase (Priority 6) */}
+      <div style={{ marginTop: 28 }}>
+        <DatabaseArchitecture />
       </div>
     </div>
   );

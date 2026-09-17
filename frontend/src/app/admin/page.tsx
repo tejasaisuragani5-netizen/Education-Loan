@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import DocumentUpload from "../../components/DocumentUpload";
 import VerificationResult from "../../components/VerificationResult";
 import AuditTrail from "../../components/AuditTrail";
+import DatabaseArchitecture from "../../components/DatabaseArchitecture";
 import { api, DocumentRequest, Student, IssuedDocument, Disbursement, VerificationResultData, BundleEvaluationData } from "../../lib/api";
 
 type AdminTab = "registry" | "verification" | "requests" | "audit";
@@ -322,6 +323,8 @@ export default function AdminPortalPage() {
       {activeTab === "audit" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
           <AuditTrail />
+
+          <DatabaseArchitecture />
 
           <div style={{ background: "white", borderRadius: 14, padding: 24, border: "1px solid #e2e8f0" }}>
             <h3 style={{ fontSize: 18, fontWeight: 700, color: "#0f172a", marginBottom: 16 }}>

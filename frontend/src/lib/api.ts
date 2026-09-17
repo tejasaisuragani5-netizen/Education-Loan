@@ -413,5 +413,9 @@ export const api = {
       body: JSON.stringify(entry),
     });
   },
+
+  async getDatabaseStatus(): Promise<any> {
+    return request("/database-status");
+  },
 };
 

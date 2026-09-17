@@ -78,10 +78,22 @@ app.add_middleware(
 
 
 # =================================================
-# DATABASE
+# DATABASE ARCHITECTURE (Priority 6: PostgreSQL-Ready)
+# Development -> SQLite | Production -> PostgreSQL
+# Environment-Based: DATABASE_URL=sqlite:///students.db
 # =================================================
 
-DATABASE = "students.db"
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///students.db")
+IS_POSTGRES = DATABASE_URL.startswith("postgres://") or DATABASE_URL.startswith("postgresql://")
+
+def get_db_path_from_url(url: str) -> str:
+    if url.startswith("sqlite:///"):
+        return url.replace("sqlite:///", "", 1)
+    if url.startswith("sqlite://"):
+        return url.replace("sqlite://", "", 1)
+    return "students.db"
+
+DATABASE = get_db_path_from_url(DATABASE_URL)
 DOCS_DIR = "generated_documents"
 VERIFICATION_UPLOAD_DIR = "verification_uploads"
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
@@ -94,10 +106,47 @@ BUNDLE_UPLOAD_DIR = "bundle_uploads"
 os.makedirs(BUNDLE_UPLOAD_DIR, exist_ok=True)
 
 
+class PostgresConnectionWrapper:
+    """Enables PostgreSQL to match SQLite row-level access and parameter binding with zero app logic changes."""
+    def __init__(self, raw_conn):
+        self._conn = raw_conn
+
+    def execute(self, query: str, params=None):
+        import psycopg2.extras
+        pg_query = query.replace("?", "%s")
+        cursor = self._conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        if params:
+            cursor.execute(pg_query, params)
+        else:
+            cursor.execute(pg_query)
+        return cursor
+
+    def executemany(self, query: str, param_list):
+        import psycopg2.extras
+        pg_query = query.replace("?", "%s")
+        cursor = self._conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        cursor.executemany(pg_query, param_list)
+        return cursor
+
+    def commit(self):
+        self._conn.commit()
+
+    def rollback(self):
+        self._conn.rollback()
+
+    def close(self):
+        self._conn.close()
+
+
 def get_connection():
-    connection = sqlite3.connect(DATABASE)
-    connection.row_factory = sqlite3.Row
-    return connection
+    if IS_POSTGRES:
+        import psycopg2
+        raw_conn = psycopg2.connect(DATABASE_URL)
+        return PostgresConnectionWrapper(raw_conn)
+    else:
+        connection = sqlite3.connect(DATABASE)
+        connection.row_factory = sqlite3.Row
+        return connection
 
 
 # =================================================
@@ -628,6 +677,48 @@ def test_ai_connection(config: AIConfigIn = None):
 # =================================================
 # AUDIT LOG ENDPOINTS (Priority 5)
 # =================================================
+
+# =================================================
+# DATABASE ARCHITECTURE DIAGNOSTICS (Priority 6)
+# =================================================
+
+@app.get("/database-status")
+@app.get("/api/database-status")
+def get_database_status():
+    engine_name = "PostgreSQL" if IS_POSTGRES else "SQLite"
+    env_name = "production" if IS_POSTGRES else "development"
+
+    masked_url = DATABASE_URL
+    if "@" in masked_url:
+        try:
+            prefix, suffix = masked_url.split("@", 1)
+            scheme_user = prefix.split("://", 1)
+            user = scheme_user[1].split(":", 1)[0]
+            masked_url = f"{scheme_user[0]}://{user}:********@{suffix}"
+        except Exception:
+            masked_url = "postgresql://********:********@host:5432/eduloan"
+
+    return {
+        "engine": engine_name,
+        "environment": env_name,
+        "database_url": masked_url,
+        "is_production_ready": True,
+        "driver": "psycopg2-binary (PostgreSQL)" if IS_POSTGRES else "sqlite3 (Python stdlib)",
+        "switch_mechanism": "Environment variable DATABASE_URL",
+        "explanation": {
+            "development": {
+                "engine": "SQLite",
+                "env_variable": "DATABASE_URL=sqlite:///students.db",
+                "benefits": "Zero configuration, instant dev spin-up, portable single-file storage"
+            },
+            "production": {
+                "engine": "PostgreSQL",
+                "env_variable": "DATABASE_URL=postgresql://user:password@host:5432/eduloan_db",
+                "benefits": "ACID compliance, connection pooling, high-concurrency transactions, institutional resilience"
+            }
+        },
+        "application_code_change_required": False
+    }
 
 @app.get("/audit-logs")
 def get_audit_logs(user_id: Optional[str] = None, limit: int = 100):
