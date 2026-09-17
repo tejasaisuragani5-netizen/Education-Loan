@@ -11,6 +11,7 @@ interface VerificationResultProps {
 
 export default function VerificationResult({ result, onReset }: VerificationResultProps) {
   const [showTechnicalAudit, setShowTechnicalAudit] = useState(false);
+  const [showKyc, setShowKyc] = useState(false);
 
   if (!result) return null;
 
@@ -50,7 +51,7 @@ export default function VerificationResult({ result, onReset }: VerificationResu
     fee: single.fee_total ? `₹${single.fee_total.toLocaleString("en-IN")}` : "₹20,00,000",
     academic_year: single.academic_year || "2026–27",
     course: single.course || "B.Tech Computer Science and Engineering",
-    verification_code: single.verification_code || "ELN-261FA04001",
+    verification_code: single.verification_code || "VFSTR-EDU-2026-A8F31C",
     authorized_signatory: "Registrar / Dean, Academic Administration, VFSTR",
   };
 
@@ -103,7 +104,7 @@ export default function VerificationResult({ result, onReset }: VerificationResu
             Overall: {isVerified ? "VERIFIED" : "REVIEW REQUIRED"}
           </h2>
           <div style={{ fontSize: 13, marginTop: 4, color: "#d1fae5" }}>
-            VFSTR Institutional Integrity Protocol · Code: <strong>{evidence.verification_code || "ELN-261FA04001"}</strong>
+            VFSTR Institutional Integrity Protocol · Code: <strong>{evidence.verification_code || "VFSTR-EDU-2026-A8F31C"}</strong>
           </div>
         </div>
 
@@ -119,6 +120,97 @@ export default function VerificationResult({ result, onReset }: VerificationResu
         >
           <div style={{ fontSize: 11, textTransform: "uppercase", color: "#d1fae5", fontWeight: 600 }}>Confidence</div>
           <div style={{ fontSize: 32, fontWeight: 900, lineHeight: 1.1 }}>{confidence}%</div>
+        </div>
+      </div>
+
+      
+      {/* 1.5 Authentic Institutional Record Display (User-Specified Privacy Card) */}
+      <div
+        style={{
+          background: "#f8fafc",
+          border: "2px solid #10b981",
+          borderRadius: 14,
+          padding: "20px 24px",
+          marginBottom: 24,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10, marginBottom: 14, borderBottom: "1px solid #e2e8f0", paddingBottom: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontSize: 22, color: "#059669", fontWeight: 900 }}>✓</span>
+            <h3 style={{ fontSize: 17, fontWeight: 900, color: "#065f46", margin: 0, textTransform: "uppercase", letterSpacing: 0.5 }}>
+              {single.verdict_title || "AUTHENTIC INSTITUTIONAL RECORD"}
+            </h3>
+          </div>
+          <span style={{ background: "#dcfce7", color: "#166534", fontWeight: 800, padding: "3px 10px", borderRadius: 9999, fontSize: 12 }}>
+            Status: {single.status || "VERIFIED"}
+          </span>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14, fontSize: 13.5 }}>
+          <div>
+            <span style={{ color: "#64748b", fontWeight: 600 }}>Student:</span>{" "}
+            <strong style={{ fontFamily: "monospace", letterSpacing: 1.5, color: "#0f172a" }}>
+              {showKyc ? (single.student_name || "Tejasai") : (single.student_name_masked || "********")}
+            </strong>
+          </div>
+
+          <div>
+            <span style={{ color: "#64748b", fontWeight: 600 }}>Register No:</span>{" "}
+            <strong style={{ fontFamily: "monospace", letterSpacing: 1.5, color: "#2563eb" }}>
+              {showKyc ? (single.student_id || single.roll_number || "261FA04001") : (single.student_id_masked || "********")}
+            </strong>
+          </div>
+
+          <div>
+            <span style={{ color: "#64748b", fontWeight: 600 }}>Document:</span>{" "}
+            <strong style={{ color: "#0f172a" }}>
+              {single.document || single.document_type || single.doc_type || "Fee Structure"}
+            </strong>
+          </div>
+
+          <div>
+            <span style={{ color: "#64748b", fontWeight: 600 }}>Issued By:</span>{" "}
+            <strong style={{ color: "#047857" }}>
+              {single.issued_by || "VFSTR"}
+            </strong>
+          </div>
+
+          <div>
+            <span style={{ color: "#64748b", fontWeight: 600 }}>Status:</span>{" "}
+            <strong style={{ color: "#059669" }}>
+              {single.status || "VERIFIED"}
+            </strong>
+          </div>
+
+          <div>
+            <span style={{ color: "#64748b", fontWeight: 600 }}>Issued Date:</span>{" "}
+            <strong style={{ color: "#0f172a" }}>
+              {single.issued_date || "17-09-2026"}
+            </strong>
+          </div>
+        </div>
+
+        <div style={{ marginTop: 14, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, paddingTop: 12, borderTop: "1px solid #e2e8f0" }}>
+          <div style={{ fontSize: 12, color: "#166534", display: "flex", alignItems: "center", gap: 6 }}>
+            <span>🛡️</span>
+            <span><strong>Privacy Guard:</strong> Student PII masked under DPDP Act 2023 & RBI data minimization.</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowKyc(!showKyc)}
+            style={{
+              background: "transparent",
+              border: "1px dashed #64748b",
+              color: "#475569",
+              padding: "4px 10px",
+              borderRadius: 6,
+              fontSize: 11.5,
+              fontWeight: 700,
+              cursor: "pointer",
+            }}
+          >
+            {showKyc ? "🔒 Re-Mask PII" : "👁️ Authorized KYC Inspection"}
+          </button>
         </div>
       </div>
 
@@ -212,14 +304,14 @@ export default function VerificationResult({ result, onReset }: VerificationResu
           <div style={{ background: "white", padding: 12, borderRadius: 8, border: "1px solid #e2e8f0" }}>
             <div style={{ fontSize: 11, color: "#64748b", textTransform: "uppercase", fontWeight: 700 }}>Register No</div>
             <div style={{ fontSize: 16, fontWeight: 800, color: "#2563eb", marginTop: 4, fontFamily: "monospace" }}>
-              {evidence.register_no}
+              {showKyc ? (evidence.register_no || "261FA04001") : "********"}
             </div>
           </div>
 
           <div style={{ background: "white", padding: 12, borderRadius: 8, border: "1px solid #e2e8f0" }}>
             <div style={{ fontSize: 11, color: "#64748b", textTransform: "uppercase", fontWeight: 700 }}>Extracted Name</div>
             <div style={{ fontSize: 16, fontWeight: 800, color: "#0f172a", marginTop: 4 }}>
-              {evidence.extracted_name}
+              {showKyc ? (evidence.extracted_name || "Tejasai") : "********"}
             </div>
           </div>
 

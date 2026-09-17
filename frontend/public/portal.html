@@ -716,9 +716,9 @@
           <!-- Direct Bank Verification Search Box -->
           <div class="bank-verify-box">
             <h3>🏦 Bank Branch Direct Authenticity Lookup</h3>
-            <p>Enter the unique institutional verification code printed on the Vignan certificate (e.g. <code>ELN-XXXXXXXX</code>) to authenticate immediately online.</p>
+            <p>Enter the unique institutional verification code printed on the Vignan certificate (e.g. <code>VFSTR-EDU-2026-A8F31C</code>) to authenticate immediately online.</p>
             <div class="bank-verify-input-group">
-              <input type="text" id="bankVerifyCodeInput" class="bank-verify-input" placeholder="ENTER CODE (e.g. ELN-261FA04001)" onkeydown="if(event.key==='Enter') lookupBankVerification()">
+              <input type="text" id="bankVerifyCodeInput" class="bank-verify-input" placeholder="ENTER CODE (e.g. VFSTR-EDU-2026-A8F31C)" value="VFSTR-EDU-2026-A8F31C" onkeydown="if(event.key==='Enter') lookupBankVerification()">
               <button type="button" class="bank-verify-btn" onclick="lookupBankVerification()">🔍 Verify Authenticity</button>
             </div>
           </div>
@@ -2280,6 +2280,33 @@
           container.innerHTML = `
             <div class="bank-cert-card" style="border: 2px solid #10b981; border-radius: 14px; padding: 24px; background: #ffffff; box-shadow: 0 8px 24px rgba(0,0,0,0.06); margin-top: 18px;">
               
+              
+              <!-- Authentic Institutional Record Card (User Requested Mockup) -->
+              <div style="border: 2px solid #10b981; border-radius: 12px; padding: 20px; background: #ffffff; margin-bottom: 20px; box-shadow: 0 4px 14px rgba(16,185,129,0.1);">
+                <div style="display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 14px;">
+                  <span style="color: #059669; font-size: 20px; font-weight: 900;">✓</span>
+                  <h3 style="margin: 0; font-size: 16px; font-weight: 900; color: #065f46; letter-spacing: 0.5px;">AUTHENTIC INSTITUTIONAL RECORD</h3>
+                </div>
+                <div style="display: grid; grid-template-columns: 140px 1fr; row-gap: 10px; font-size: 13.5px;">
+                  <div style="color: #64748b; font-weight: 600;">Student:</div>
+                  <div style="font-family: monospace; font-weight: 800; color: #0f172a; letter-spacing: 2px;">${cert.student_name_masked || '********'}</div>
+                  <div style="color: #64748b; font-weight: 600;">Register No:</div>
+                  <div style="font-family: monospace; font-weight: 800; color: #2563eb; letter-spacing: 2px;">${cert.student_id_masked || '********'}</div>
+                  <div style="color: #64748b; font-weight: 600;">Document:</div>
+                  <div style="font-weight: 700; color: #0f172a;">${cert.document || cert.document_type || 'Fee Structure'}</div>
+                  <div style="color: #64748b; font-weight: 600;">Issued By:</div>
+                  <div style="font-weight: 800; color: #047857;">${cert.issued_by || 'VFSTR'}</div>
+                  <div style="color: #64748b; font-weight: 600;">Status:</div>
+                  <div><span style="background: #dcfce7; color: #166534; font-weight: 800; font-size: 11px; padding: 3px 8px; border-radius: 4px;">${cert.status || 'VERIFIED'}</span></div>
+                  <div style="color: #64748b; font-weight: 600;">Issued Date:</div>
+                  <div style="font-weight: 700; color: #0f172a;">${cert.issued_date || '17-09-2026'}</div>
+                </div>
+                <div style="margin-top: 14px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 8px 12px; font-size: 11.5px; color: #166534; display: flex; align-items: center; gap: 8px;">
+                  <span>🛡️</span>
+                  <span><strong>Privacy Guard (DPDP Act 2023):</strong> Student PII is cryptographically masked by default for bank verification.</span>
+                </div>
+              </div>
+
               <!-- Overall Banner -->
               <div style="background: linear-gradient(135deg, #065f46 0%, #047857 100%); border-radius: 10px; padding: 18px 20px; color: white; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
                 <div>

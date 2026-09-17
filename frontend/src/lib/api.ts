@@ -101,6 +101,17 @@ export interface VerificationResultData {
   bank_name?: string;
   verification_code?: string;
   issued_date?: string;
+  verdict_title?: string;
+  status?: string;
+  document?: string;
+  issued_by?: string;
+  student?: string;
+  register_no?: string;
+  student_name_masked?: string;
+  student_id_masked?: string;
+  privacy_preserved?: boolean;
+  privacy_notice?: string;
+  download_url?: string;
   security_seal_detected?: boolean;
   tamper_risk?: "LOW" | "MEDIUM" | "HIGH";
   tamper_reasons?: string[];
