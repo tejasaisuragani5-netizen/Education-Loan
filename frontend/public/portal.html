@@ -1089,8 +1089,8 @@
 
 <!-- Physical Document Scan & OCR Upload -->
           <div class="section" style="margin-top:24px;">
-            <h2>Scan & OCR Authenticity Verification (Scanned Files)</h2>
-            <p style="font-size:13px; color:#64748b; margin-bottom:14px;">Upload a scanned document photo or student ID card to run the circular seal detector and barcode/QR decoder.</p>
+            <h2>AI-Assisted Document Risk Screening & OCR Verification</h2>
+            <p style="font-size:13px; color:#64748b; margin-bottom:14px;">Multimodal AI screens seal morphology, layout consistency, and tampering risk. Clear documents are fast-tracked; uncertain cases (&lt;90% confidence) are automatically escalated for human registrar review.</p>
             <form id="verifyUploadForm" onsubmit="handleVerifyUpload(event)" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
               <div class="form-group">
                 <label>Student Register Number</label>
@@ -2409,14 +2409,20 @@
         const data = await res.json();
         if (res.ok) {
           const isPass = data.ai_verdict === 'VERIFIED' || data.ai_verdict === 'REAL';
+          const isReview = data.ai_verdict === 'REVIEW';
           document.getElementById('scorecardResultContainer').innerHTML = `
-            <div style="background:${isPass ? '#f0fdf4' : '#fef2f2'}; border:1.5px solid ${isPass ? '#86efac' : '#fecaca'}; border-radius:10px; padding:16px; margin-top:16px;">
+            <div style="background:${isPass ? '#f0fdf4' : (isReview ? '#fffbeb' : '#fef2f2')}; border:1.5px solid ${isPass ? '#86efac' : (isReview ? '#fde68a' : '#fecaca')}; border-radius:10px; padding:16px; margin-top:16px;">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <strong style="font-size:16px; color:${isPass ? '#166534' : '#991b1b'};">${isPass ? '✓ DOCUMENT AUTHENTIC' : '✗ VERIFICATION FAILED'}</strong>
-                <span class="scorecard-badge ${isPass ? 'pass' : 'fail'}">${data.ai_verdict}</span>
+                <strong style="font-size:16px; color:${isPass ? '#166534' : (isReview ? '#92400e' : '#991b1b')};">
+                  ${isPass ? '✓ AI-ASSISTED VERIFICATION PASSED' : (isReview ? '⚠ ESCALATED TO HUMAN REVIEW QUEUE' : '✗ VERIFICATION FAILED')}
+                </strong>
+                <span class="scorecard-badge ${isPass ? 'pass' : (isReview ? 'warn' : 'fail')}">${data.ai_verdict}</span>
               </div>
               <p style="font-size:13px; color:#334155; margin:0 0 10px 0;">${data.reason || 'Authenticity analysis complete.'}</p>
-              <div style="font-size:12px; color:#64748b;">Confidence: <strong>${Math.round(data.confidence || 0)}%</strong> · Engine: Built-in Verification Engine</div>
+              <div style="font-size:12px; color:#64748b; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                <div>Confidence: <strong>${Math.round(data.confidence || 0)}%</strong> · AI Risk Screening</div>
+                <div style="color:#2563eb; font-weight:700;">🛡️ Human-in-the-Loop (HITL) Active</div>
+              </div>
             </div>
           `;
           showNotice('Scan complete!');

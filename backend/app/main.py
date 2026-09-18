@@ -2673,11 +2673,11 @@ def run_vignan_scorecard_verification(
     elif is_low_res or seal_status == "warn" or prog_status == "warn":
         final_verdict = "REVIEW"
         confidence = 75.0
-        reason = "Document requires physical verification of facts against originals by the loan desk officer."
+        reason = "AI-Assisted Screening Flag: Visual uncertainty detected. Automatically routed to Human Registrar / Accounts Officer Queue for physical verification."
     else:
         final_verdict = "VERIFIED"
         confidence = 97.0
-        reason = f"All institutional credentials, student registry facts ({clean_sid} - {expected_name}), official university seal, and layout verified against Vignan records."
+        reason = f"AI-Assisted Verification Passed: Student registry credentials ({clean_sid} - {expected_name}), university emblem morphology, and fee ledger reconciled with 0 anomalies."
 
     scorecard = [
         {"label": "Institution Name", "value": inst_val, "status": inst_status},
@@ -2779,21 +2779,23 @@ def call_gemini_document_agent(
     student_name = student.get("name", "Student") if student else "Student"
 
     prompt = f"""
-You are the Document Verification Agent for Vignan's Foundation for Science, Technology and Research (VFSTR).
+You are the AI-Assisted Document Risk Screening Agent for Vignan's Foundation for Science, Technology and Research (VFSTR).
 Claimed document: {document_type}.
 Student on file: {student_name} (Register No: {student_id}).
 
-Analyze the document image carefully for visual authenticity:
-- University Seal: Is the circular official seal present and clear?
-- Template/Layout: Does it match institutional layout or similar?
-- Tampering: Are there mismatched fonts, pixel compression artifacts, edited overlays, or erased text?
+Analyze the document image for visual risk screening, layout consistency, and potential anomalies:
+- University Seal: Is the circular institutional emblem visible and positioned normally? (Screen for presence/morphology; note any blur or visual anomalies)
+- Template/Layout: Does it conform to standard institutional document layout?
+- Tampering Risk: Screen for visible digital splicing, font mismatches, pixel halos, white-out artifacts, or altered text.
+- Human Review Recommendation: Should this document be fast-tracked or routed to a human registrar for physical verification?
 
 Return valid JSON with:
 {{
   "seal_detected": true,
   "layout_match": true,
   "tampering_detected": false,
-  "reason": "short explanation"
+  "requires_human_review": false,
+  "reason": "short explanation of visual observations and risk level"
 }}
 """
 

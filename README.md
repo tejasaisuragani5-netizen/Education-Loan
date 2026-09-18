@@ -63,7 +63,8 @@ npm run dev
 ## ✨ Key Features & Clean State
 
 - **100% Clean Database:** No pre-seeded dummy records. You can directly enter your real student details.
-- **Official VFSTR Authenticity Scorecard:** Evaluates Institution Name, Register No, Student Name, Program/Branch, Document Number, Barcode/QR, University Circular Seal, Template Layout, and Tampering Indicators.
+- **AI-Assisted Verification & Risk Screening:** Evaluates Institution Name, Register No, Student Name, Program/Branch, Document Number, Barcode/QR, University Seal presence, Template Layout, and Tampering Indicators.
+- **Human-in-the-Loop (HITL) Governance:** Uncertain cases (<90% confidence or visual irregularities) are automatically routed to the University Registrar / Accounts Officer for physical verification.
 - **Student ID Barcode Verification:** Mandatory back side upload for student ID cards with real-time barcode decoding.
 - **No Fabricated Matches:** Clean rejection indicators (✗ NOT FOUND, ✗ UNVERIFIED, ✗ NOT DETECTED) when unregistered documents are uploaded.
 - **Zero Technical Debug Artifacts:** Completely user-ready without debug placeholders or engine badges.

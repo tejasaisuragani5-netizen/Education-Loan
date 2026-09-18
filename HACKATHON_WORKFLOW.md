@@ -9,7 +9,7 @@
 According to Reserve Bank of India (RBI) sectoral deployment data, India's outstanding education loan portfolio across Scheduled Commercial Banks exceeds **₹1,00,000+ Crores**. Yet, under standard IBA (Indian Banks' Association) procedural guidelines, students and universities face a **2 to 4-week administrative turnaround time** navigating manual certificate requests, registrar seals, fee validations, and branch document scrutiny. Concurrently, banks suffer from fraudulent admission claims and manual verification overhead, while university finance sections inadvertently issue fee default notices and block examination hall-tickets for students whose bank disbursements are merely in transit.
 
 **Agent 43 solves this triangular friction** through an autonomous, guardrailed, multi-stage agentic system that:
-1. **Automates Multi-Certificate Forensic Verification** in seconds (typically 2–4 seconds end-to-end) using multimodal LLM vision (Google Gemini) with an 8-point inspection scorecard.
+1. **Provides AI-Assisted Multi-Certificate Risk Screening** in seconds (typically 2–4 seconds end-to-end) using multimodal vision (Google Gemini) with an 8-point inspection scorecard, triaging clear documents while escalating uncertain cases to human review.
 2. **Performs Cross-Document Identity Synthesis**, reconciling discrepancies across Bonafide, Fee Structures, Admission Orders, and Marksheets.
 3. **Autonomously Matches Government & Banking Schemes** (Vidya Lakshmi, CGFEL Collateral-Free up to ₹7.5L, CSIS Moratorium Interest Subsidy, and Premier Institutional Category Schemes).
 4. **Synthesizes a Bank-Ready Institutional Eligibility Dossier** with tamper-evident cryptographic QR verification codes.
@@ -92,18 +92,24 @@ sequenceDiagram
 - **Agent Action**: When a student enters their Register Number (e.g., `261FA04001`), the agent queries the university registry to fetch verified academic status, program (`B.Tech CSE`), admission year (`2026`), total tuition fee (`₹20,00,000`), current fee ledger balance, and active hold statuses.
 - **Context Injection**: The agent dynamically binds the verified institutional baseline to prevent hallucinations and establish ground truth for all subsequent document audits.
 
-### Stage 2: Multimodal Forensic Document Inspection (Gemini Vision)
-- **Agent Action**: The agent passes uploaded document images/PDFs (Bonafide, Fee Structure, Admission Offer, Marksheet) to the Google Gemini Vision model with institutional prompting.
-- **8-Point Inspection Protocol**:
-  1. `student_name_match`: Strict fuzzy matching against university registry.
-  2. `student_id_match`: Exact alphanumeric match of the register number.
-  3. `institution_seal_detected`: Computer vision verification of the VFSTR official circular emblem.
-  4. `authorized_signature_detected`: Verification of Dean/Registrar/Finance Officer signatures.
-  5. `academic_year_valid`: Document validity matches active academic session.
-  6. `total_fee_consistent`: Numerical fee matches institutional fee schedule.
-  7. `tampering_detected`: Inspection for digital edits, font irregularities, or spliced pixels.
-  8. `image_quality_acceptable`: Resolution check to guarantee bank admissibility.
-- **Output**: JSON payload with `ai_verdict` (`VERIFIED` / `FLAGGED` / `REJECTED`), `confidence` score (e.g., `0.98`), and forensic audit trail.
+### Stage 2: Multimodal Document Risk Screening & AI-Assisted Verification (Gemini Vision)
+- **Design Philosophy**: AI serves as an **intelligent risk detector and triage assistant**, not an infallible legal authority. Definitive authenticity is anchored in verified university registry records, while Gemini Vision performs visual presence, morphology, and anomaly screening.
+- **8-Point AI-Assisted Inspection Protocol**:
+  1. `student_name_match`: Fuzzy consistency check against university student registry.
+  2. `student_id_match`: Exact alphanumeric validation against institutional records.
+  3. `institution_seal_screened`: Computer vision presence & morphology check of the VFSTR circular emblem *(visual risk indicator; not a substitute for physical embossed seal guarantee)*.
+  4. `authorized_signature_block_screened`: Visual presence and stroke continuity check of the registrar/finance signatory area *(anomaly screening rather than definitive biometric graphology)*.
+  5. `academic_year_valid`: Temporal validation ensuring the certificate applies to the active academic session.
+  6. `total_fee_consistent`: Automated reconciliation against approved university syndicate fee schedules.
+  7. `tampering_risk_analysis`: Multimodal pixel inspection for digital splicing, font mismatches, pixel halos, or white-out artifacts.
+  8. `image_quality_acceptable`: Resolution and clarity check ensuring legal legibility.
+
+- **Human-in-the-Loop (HITL) Governance Framework**:
+  To ensure statutory compliance and eliminate false-positive risks:
+  - **Tier 1 (Automated Preliminary Clearance — Confidence $\ge 90\%$ + Zero Flags)**: Passed directly to dossier synthesis.
+  - **Tier 2 (Human Review Escalation — Confidence $< 90\%$ OR Visual Uncertainty)**: Automatically routed to the **University Accounts / Registrar Officer Verification Queue** with highlighted visual risk markers for physical document inspection.
+  - **Tier 3 (Flagged Rejection — Registry Discrepancy or Tampering Detected)**: Blocked immediately with an adversarial fraud entry logged to the immutable audit trail.
+- **Output**: Structured JSON payload with `ai_verdict` (`VERIFIED` / `REVIEW` / `REJECTED`), `confidence` score, risk classification, and human escalation routing.
 
 ### Stage 3: Cross-Document Identity Synthesis
 - **Agent Action**: Rather than verifying files in silos, Agent 43 cross-compares all 4 certificates simultaneously:
