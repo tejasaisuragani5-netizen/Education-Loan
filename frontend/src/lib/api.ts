@@ -215,7 +215,7 @@ export function getApiBaseUrl(): string {
   if (process.env.NEXT_PUBLIC_API_BASE_URL) {
     return process.env.NEXT_PUBLIC_API_BASE_URL.replace(/\/$/, "");
   }
-  return "https://choose-site-replies-citysearch.trycloudflare.com";
+  return "https://edit-pill-receiver-nirvana.trycloudflare.com";
 }
 
 export function setApiBaseUrl(url: string) {

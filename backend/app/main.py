@@ -88,7 +88,7 @@ ALLOWED_ORIGINS = [
     "http://localhost:8080",
     "http://127.0.0.1:8080",
     "https://education-loan-assist.vercel.app",
-    "https://patients-original-carroll-sphere.trycloudflare.com",
+    "https://edit-pill-receiver-nirvana.trycloudflare.com",
 ]
 _extra_origins = os.getenv("ALLOWED_ORIGINS", "")
 if _extra_origins:
